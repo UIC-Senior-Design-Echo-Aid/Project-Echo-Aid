@@ -1,1 +1,64 @@
 print("POSTMATLAB CODE HERE")
+clear all; clc;
+Title = '317_Lab3.m4a'; % place in quotes the name of your WAV file
+[my_sound,fs] = audioread(Title); % getting WAV file
+% a stereo WAV file consists of two columns having the same length.
+N = length(my_sound); % each channel has N samples
+left_chan = my_sound(1:N,1); % getting the left channel
+x = zeros(N,1); % setting up space for the quantized sound
+
+nF = 9;
+%for j=1:11
+    
+    for i=1:N
+        x(i)=bits(left_chan(i),nF);
+    end
+ 
+    signal_energy = sum(x.*x); % signal energy
+    S_N = 10*log10(signal_energy) % signal to noise ratio
+%end
+
+sound(x,fs); 
+% stem(S_N, nF)
+% title('Signal to Noise Ratio for nF = [3,13]');
+% ylabel('nF') ;
+% xlabel('Signal to Noise Ratio'); 
+
+
+
+
+
+function y = bits(x,nF)
+% Input x is a signed fraction. The input is converted to output y,
+% where the absolute value of y has a binary representation using nF
+% fractional bits.
+if x == 0 | nF <= 0
+    y=0;
+    return
+end
+z = abs(x);
+if x == z
+    sign=1;
+else
+    sign=-1;
+end
+
+if z >= 1
+    y=sign;
+    return
+end
+
+y = 0; half_power = 1.0;
+for n=1:nF
+    half_power=0.5*half_power;
+    z_2 = 2*z;
+    if z_2 >= 1
+        y = y+half_power;
+        z = z_2-1;
+    else
+        z = z_2;
+    end
+end
+y = sign*y;
+end
+
