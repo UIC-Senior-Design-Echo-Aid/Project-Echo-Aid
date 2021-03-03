@@ -1,0 +1,33 @@
+[DataIn, fs] = audioread(['AudioPhile.wav']);
+
+[N,P] = size(DataIn);
+
+ts = 1/fs;
+tmax= (N-1)*ts;
+t = 0:ts:tmax;
+
+plot(t, DataIn)
+title('AudioPhileSignal');
+f = -fs/2:fs/(N-1):fs/2;
+z = fftshift(fft(DataIn));
+plot(f,abs(z))
+title('AudioPhile FRQPWR');
+xlabel('Frequency'); 
+ylabel('Power');
+
+[DataIn, fs] = audioread(['Hospital_Room_Distortion.wav']);
+
+[N,P] = size(DataIn);
+
+ts = 1/fs;
+tmax= (N-1)*ts;
+t = 0:ts:tmax;
+
+plot(t, DataIn)
+title('HospitalRoomDistortionSignal');
+f = -fs/2:fs/(N-1):fs/2;
+z = fftshift(fft(DataIn));
+plot(f,abs(z))
+title('HospitalRoomDistortionFRQPOWER');
+xlabel('Frequency'); 
+ylabel('Power');
