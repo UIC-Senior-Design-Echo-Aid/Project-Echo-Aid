@@ -1,0 +1,66 @@
+clear all; clc;
+
+Audio = 'AudioPhile.wav'; 
+[soundInput,fs] = audioread(Audio);           % Getting WAV file
+amplifier = 8/3;                              % Elevating noise-freq
+    %When (amplifier = 1) original audio outputs
+voiceAmplified = soundInput*amplifier;        % Amplified voice
+N = length(voiceAmplified);                   % Each channel has N samples
+left_chan = voiceAmplified(1:N,1);            % Getting the left channel
+x = zeros(N,1);                               % Setting up space for the quantized sound
+ts = 1/fs;                                  
+tmax= (N-1)*ts;
+t = 0:ts:tmax;
+
+nF = 9;
+    for i=1:N
+        x(i)=bits(left_chan(i),nF);
+    end
+    
+%Outputting Noise
+sound(x,fs); 
+
+%Outputting Signal to Noise ratio
+signal_energy = sum(x.*x);                  % signal energy
+S_N = 10*log10(signal_energy)               % signal to noise ratio
+
+%Outputting Signal Plot
+plot(t, voiceAmplified)
+title('Sound Sample');
+xlabel('Time (t)');
+ylabel('Frequency Hz');
+
+function y = bits(x,nF)
+% Input x is a signed fraction. The input is converted to output y,
+% where the absolute value of y has a binary representation using nF
+% fractional bits.
+if x == 0 | nF <= 0
+        y=0;
+   return
+end
+
+z = abs(x);
+if x == z
+    sign=1;
+else
+    sign=-1;
+end
+
+if z >= 1
+    y=sign;
+    return
+end
+
+y = 0; half_power = 1.0;
+for n=1:nF
+    half_power=0.5*half_power;
+    z_2 = 2*z;
+    if z_2 >= 1
+        y = y+half_power;
+        z = z_2-1;
+    else
+        z = z_2;
+    end
+end
+y = sign*y;
+end
